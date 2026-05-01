@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mini App</title>
+</head>
+<body style="text-align:center; font-family:sans-serif;">
+
+  <h1>🎁 Открыть кейс</h1>
+  <button onclick="openCase()" style="padding:15px; font-size:18px;">
+    Открыть
+  </button>
+
+  <h2 id="result"></h2>
+
+  <script>
+    function openCase() {
+      let rewards = [5, 10, 20, 50];
+      let win = rewards[Math.floor(Math.random() * rewards.length)];
+      document.getElementById("result").innerText = "Тебе выпало: " + win + " ⭐";
+    }
+  </script>
+
+</body>
+</html>
