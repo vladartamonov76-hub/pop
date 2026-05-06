@@ -1,25 +1,214 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Mini App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<title>Mini App</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(180deg, #1c1f4a, #3a2ea8);
+  color: white;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  font-size: 18px;
+}
+
+.live {
+  display: flex;
+  gap: 5px;
+}
+
+/* MAIN */
+.container {
+  padding: 15px;
+}
+
+.card {
+  background: linear-gradient(145deg, #4b3ecf, #2a2a6a);
+  border-radius: 20px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.big-button {
+  background: linear-gradient(90deg, #6c5cff, #9b6dff);
+  padding: 15px;
+  border-radius: 15px;
+  text-align: center;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* GRID BUTTONS */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.grid div {
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.red { background: #ff4d4d; }
+.green { background: #4caf50; }
+.blue { background: #3f8cff; }
+
+/* CASE SCREEN */
+.case-screen {
+  display: none;
+}
+
+.case {
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.items {
+  display: flex;
+  transition: transform 2s ease-out;
+}
+
+.item {
+  min-width: 100px;
+  margin: 5px;
+  padding: 20px;
+  background: #2a2a6a;
+  border-radius: 15px;
+  text-align: center;
+}
+</style>
 </head>
-<body style="text-align:center; font-family:sans-serif;">
 
-  <h1>🎁 Открыть кейс</h1>
-  <button onclick="openCase()" style="padding:15px; font-size:18px;">
-    Открыть
-  </button>
+<body>
 
-  <h2 id="result"></h2>
+<div id="main">
 
-  <script>
-    function openCase() {
-      let rewards = [5, 10, 20, 50];
-      let win = rewards[Math.floor(Math.random() * rewards.length)];
-      document.getElementById("result").innerText = "Тебе выпало: " + win + " ⭐";
-    }
-  </script>
+  <div class="header">
+    <div class="live">LIVE ⭐⭐⭐⭐⭐</div>
+    <div>⭐ <span id="stars">100</span></div>
+  </div>
+
+  <div class="container">
+
+    <!-- РУЛЕТКА -->
+    <div class="card">
+      <h3>🎰 Рулетка</h3>
+      <div class="big-button" onclick="openCaseScreen()">Крутить</div>
+    </div>
+
+    <!-- КНОПКИ -->
+    <div class="grid">
+      <div class="red">⚔️ PvP</div>
+      <div class="green">🥚 Яйца</div>
+      <div class="red">🎰 Слоты</div>
+      <div class="blue">💎 Краны</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- CASE SCREEN -->
+<div id="caseScreen" class="case-screen">
+
+  <div class="header">
+    <div onclick="goBack()">⬅ Назад</div>
+    <div>⭐ <span id="stars2">100</span></div>
+  </div>
+
+  <div class="container">
+
+    <div class="case">
+      <div class="items" id="items"></div>
+    </div>
+
+    <div class="big-button" onclick="spin()">Крутить за 10⭐</div>
+
+  </div>
+
+</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+let stars = 100;
+
+const rewards = [
+  {name: "10⭐", value: 10},
+  {name: "20⭐", value: 20},
+  {name: "50⭐", value: 50},
+  {name: "100⭐", value: 100}
+];
+
+const itemsContainer = document.getElementById("items");
+
+function updateStars() {
+  document.getElementById("stars").innerText = stars;
+  document.getElementById("stars2").innerText = stars;
+}
+
+function openCaseScreen() {
+  document.getElementById("main").style.display = "none";
+  document.getElementById("caseScreen").style.display = "block";
+  generateItems();
+  updateStars();
+}
+
+function goBack() {
+  document.getElementById("main").style.display = "block";
+  document.getElementById("caseScreen").style.display = "none";
+}
+
+function generateItems() {
+  itemsContainer.innerHTML = "";
+  for (let i = 0; i < 30; i++) {
+    let reward = rewards[Math.floor(Math.random() * rewards.length)];
+    let div = document.createElement("div");
+    div.className = "item";
+    div.innerText = reward.name;
+    itemsContainer.appendChild(div);
+  }
+}
+
+function spin() {
+  if (stars < 10) {
+    alert("Мало звёзд");
+    return;
+  }
+
+  stars -= 10;
+  updateStars();
+
+  generateItems();
+
+  let winIndex = Math.floor(Math.random() * 20) + 5;
+  let offset = winIndex * 110;
+
+  itemsContainer.style.transform = `translateX(-${offset}px)`;
+
+  setTimeout(() => {
+    let reward = rewards[Math.floor(Math.random() * rewards.length)];
+    stars += reward.value;
+    updateStars();
+    alert("Выпало: " + reward.name);
+  }, 2000);
+}
+</script>
 
 </body>
 </html>
